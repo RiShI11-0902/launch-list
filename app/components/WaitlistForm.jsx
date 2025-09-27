@@ -1,6 +1,6 @@
 "use client"
 import { Button } from "../../components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Loader } from "lucide-react";
 import { Input } from "../../components/ui/input";
 import { Textarea } from "../../components/ui/textarea";
 import { useState } from "react";
@@ -9,9 +9,26 @@ const WaitlistForm = () => {
   const [suggestion, setSuggestion] = useState("");
   const [name, setName] = useState("");
   const [message, setMessage] = useState()
+  const [laoder, setlaoder] = useState()
+
+  const handleEmailChange = (e) => {
+    const value = e.target.value;
+    // Allow only characters valid in emails
+    const emailRegex = /^[a-zA-Z0-9@._-]*$/;
+
+    if (emailRegex.test(value)) {
+      setEmail(value);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setlaoder(true)
+
+    if (email == "") {
+      setMessage("Please Enter Email")
+      return;
+    }
 
     const res = await fetch("/api/waitlist", {
       method: "POST",
@@ -28,6 +45,7 @@ const WaitlistForm = () => {
     } else {
       setMessage(`❌ ${data.error}`);
     }
+    setlaoder(false)
   };
 
   return (
@@ -52,7 +70,7 @@ const WaitlistForm = () => {
               placeholder="Your email"
               className="w-full px-5 py-3.5 rounded-xl border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary text-base"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={handleEmailChange}
             />
           </div>
 
@@ -68,10 +86,10 @@ const WaitlistForm = () => {
           <Button
             size="lg"
             type="submit"
-            className="w-full px-6 py-4 text-lg font-semibold rounded-xl shadow-glow cursor-pointer"
+            className="w-full px-6 mx-auto py-4 text-lg font-semibold rounded-xl shadow-glow cursor-pointer"
             onClick={handleSubmit}
           >
-            Join the Waitlist
+            {laoder ? <Loader className="animate-spin w-5" /> : "Join the Waitlist"}
           </Button>
 
           {
